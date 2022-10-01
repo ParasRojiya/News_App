@@ -11,27 +11,14 @@ class TopHeadlines {
   }
 }
 
-class BusinessNews {
+class AllCategories {
   final List articles;
-  BusinessNews({
+  AllCategories({
     required this.articles,
   });
 
-  factory BusinessNews.fromJSON({required Map json}) {
-    return BusinessNews(
-      articles: json['articles'],
-    );
-  }
-}
-
-class AppleNews {
-  final List articles;
-  AppleNews({
-    required this.articles,
-  });
-
-  factory AppleNews.fromJSON({required Map json}) {
-    return AppleNews(
+  factory AllCategories.fromJSON({required Map json}) {
+    return AllCategories(
       articles: json['articles'],
     );
   }

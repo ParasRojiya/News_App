@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../globals/global.dart';
-import '../heplers/news_api_helper.dart';
+import '../helpers/news_api_helper.dart';
 import '../modals/modals.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,33 +12,61 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  APIUrl(String category) {
+    if (category == 'Business') {
+      Global.url =
+          "https://newsapi.org/v2/top-headlines?country=in&category=business&apiKey=42af38b65580434da69c5d60ecf4bdff";
+      Global.category = "Business";
+    } else if (category == 'Apple News') {
+      Global.url =
+          "https://newsapi.org/v2/everything?q=apple&from=2022-09-28&to=2022-09-28&sortBy=popularity&apiKey=42af38b65580434da69c5d60ecf4bdff";
+      Global.category = "Apple News";
+    } else if (category == 'Sports') {
+      Global.url =
+          "https://newsapi.org/v2/top-headlines?country=in&category=sports&apiKey=42af38b65580434da69c5d60ecf4bdff";
+      Global.category = "Sports";
+    } else if (category == 'Entertainment') {
+      Global.url =
+          "https://newsapi.org/v2/top-headlines?country=in&category=entertainment&apiKey=42af38b65580434da69c5d60ecf4bdff";
+      Global.category = "Entertainment";
+    } else if (category == "Health") {
+      Global.url =
+          "https://newsapi.org/v2/top-headlines?country=in&category=health&apiKey=42af38b65580434da69c5d60ecf4bdff";
+      Global.category = "Health";
+    } else if (category == "Technology") {
+      Global.url =
+          "https://newsapi.org/v2/top-headlines?country=in&category=technology&apiKey=42af38b65580434da69c5d60ecf4bdff";
+      Global.category = "Technology";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    double _height = MediaQuery.of(context).size.height;
-    double _width = MediaQuery.of(context).size.width;
+    double width = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           title: const Text("News App"),
           centerTitle: true,
         ),
-        drawer: const Drawer(),
+        drawer: const Drawer(backgroundColor: Colors.grey),
         body: Container(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: _width,
+                width: width,
                 height: 70,
                 margin: const EdgeInsets.all(8),
                 padding: const EdgeInsets.all(6),
-                // color: Colors.grey,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
                   child: Row(
                     children: Global.categories.map((e) {
                       return InkWell(
                         onTap: () {
+                          APIUrl(e['category']);
                           Navigator.of(context)
                               .pushNamed('category_page', arguments: e);
                         },
@@ -90,6 +118,7 @@ class _HomePageState extends State<HomePage> {
                         TopHeadlines? data = snapshot.data;
 
                         return ListView.builder(
+                          physics: const BouncingScrollPhysics(),
                           itemCount: data?.articles.length,
                           itemBuilder: (context, i) {
                             return InkWell(
@@ -98,8 +127,8 @@ class _HomePageState extends State<HomePage> {
                                     arguments: data.articles[i]);
                               },
                               child: Container(
-                                width: _width,
-                                height: 370,
+                                width: width,
+                                // height: 370,
                                 margin: const EdgeInsets.symmetric(
                                     vertical: 8, horizontal: 4),
                                 padding: const EdgeInsets.all(1),
@@ -116,52 +145,45 @@ class _HomePageState extends State<HomePage> {
                                     ]
                                     // border: Border.all(color: Colors.black),
                                     ),
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image: NetworkImage(
-                                                  "${data!.articles[i]['urlToImage']}"),
-                                              fit: BoxFit.cover),
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        height: 260,
-                                        width: _width,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: NetworkImage(
+                                                "${data!.articles[i]['urlToImage']}"),
+                                            fit: BoxFit.cover),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        "${data.articles[i]['title']}",
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                        textAlign: TextAlign.start,
+                                      height: 260,
+                                      width: width,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "${data.articles[i]['title']}",
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
                                       ),
-                                      const SizedBox(height: 12),
-                                      const Text(
-                                        "Tap to see more",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        textAlign: TextAlign.start,
+                                      textAlign: TextAlign.start,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    const Text(
+                                      "Tap to see more",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                    ],
-                                  ),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                  ],
                                 ),
                               ),
                             );
-
-                            //return Text("${data?.articles[i]['author']}");
                           },
                         );
                       }
-
                       return const Center(
                         child: CircularProgressIndicator(),
                       );

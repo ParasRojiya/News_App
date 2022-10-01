@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/heplers/news_api_helper.dart';
+import 'package:news_app/helpers/news_api_helper.dart';
 
+import '../globals/global.dart';
 import '../modals/modals.dart';
 
 class CategoryPage extends StatefulWidget {
@@ -11,62 +12,35 @@ class CategoryPage extends StatefulWidget {
 }
 
 class _CategoryPageState extends State<CategoryPage> {
-  String title = "Category";
   @override
   Widget build(BuildContext context) {
     dynamic res = ModalRoute.of(context)!.settings.arguments;
-    double _height = MediaQuery.of(context).size.height;
-    double _width = MediaQuery.of(context).size.width;
-
-    if (res['category'] == 'Business') {
-      title = "Business";
-    } else if (res['category'] == 'Apple News') {
-      title = 'Apple News';
-    } else if (res['category'] == 'Crypto') {
-      title = "Crypto";
-    } else if (res['category'] == 'Sports') {
-      title = 'Sports';
-    } else if (res['category'] == 'Entertainment') {
-      title = 'Entertainment';
-    }
-
-    fetchNewsData() {
-      if (res['category'] == 'Business') {
-        return BusinessAPIHelper.businessAPIHelper.fetchBusinessNews();
-      } else if (res['category'] == 'Apple News') {
-        return AppleAPIHelper.appleAPIHelper.fetchAppleNews();
-      } else if (res['category'] == 'Crypto') {
-      } else if (res['category'] == 'Sports') {
-      } else if (res['category'] == 'Entertainment') {}
-    }
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(Global.category),
         centerTitle: true,
       ),
       body: Container(
-        height: _height,
-        width: _width,
+        height: height,
+        width: width,
         margin: const EdgeInsets.all(4),
         padding: const EdgeInsets.all(4),
         child: FutureBuilder(
-          future: fetchNewsData(),
+          future:
+              AllCategoriesAPIHelper.allCategoriesAPIHelper.fetchCategoryNews(),
           builder: (context, AsyncSnapshot snapshot) {
             if (snapshot.hasError) {
               return Center(
                 child: Text("${snapshot.error}"),
               );
             } else if (snapshot.hasData) {
-              if (res['category'] == 'Business') {
-              } else if (res['category'] == 'Apple News') {
-                AppleNews data = snapshot.data;
-              } else if (res['category'] == 'Crypto') {
-              } else if (res['category'] == 'Sports') {
-              } else if (res['category'] == 'Entertainment') {}
+              AllCategories data = snapshot.data;
 
-              BusinessNews data = snapshot.data;
               return ListView.builder(
+                physics: const BouncingScrollPhysics(),
                 itemCount: data.articles.length,
                 itemBuilder: (context, i) {
                   return InkWell(
@@ -75,8 +49,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           arguments: data.articles[i]);
                     },
                     child: Container(
-                      width: _width,
-                      height: 370,
+                      width: width,
                       margin: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 4),
                       padding: const EdgeInsets.all(1),
@@ -90,53 +63,46 @@ class _CategoryPageState extends State<CategoryPage> {
                                 color: Colors.grey,
                                 blurRadius: 4,
                                 spreadRadius: 1)
-                          ]
-                          // border: Border.all(color: Colors.black),
+                          ]),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: NetworkImage(
+                                      "${data.articles[i]['urlToImage']}"),
+                                  fit: BoxFit.cover),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            height: 260,
+                            width: width,
                           ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: NetworkImage(
-                                        "${data!.articles[i]['urlToImage']}"),
-                                    fit: BoxFit.cover),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              height: 260,
-                              width: _width,
+                          const SizedBox(height: 8),
+                          Text(
+                            "${data.articles[i]['title']}",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "${data.articles[i]['title']}",
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                              textAlign: TextAlign.start,
+                            textAlign: TextAlign.start,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            "Tap to see more",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              "Tap to see more",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.start,
-                            ),
-                          ],
-                        ),
+                            textAlign: TextAlign.start,
+                          ),
+                        ],
                       ),
                     ),
                   );
-
-                  //return Text("${data?.articles[i]['author']}");
                 },
               );
             }
-
             return const Center(
               child: CircularProgressIndicator(),
             );
@@ -144,9 +110,5 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
       ),
     );
-  }
-
-  categoryNews(dynamic res) {
-    if (res['category'] == 'Business') {}
   }
 }
